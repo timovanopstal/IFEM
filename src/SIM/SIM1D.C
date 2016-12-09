@@ -277,6 +277,15 @@ bool SIM1D::parse (const TiXmlElement* elem)
     else if (!strcasecmp(elem->Value(),"boundaryconditions"))
       result &= this->parseBCTag(child);
 
+  // Test if multipatch: calling createFEMmodel here throws away rotation DOFs.
+  if (myGen && result && this->getNoPatches()>1) {
+    if (!this->createFEMmodel()) return false;
+    myGen->createTopology(*this);
+  }
+
+  delete myGen;
+  myGen = nullptr;
+
   return result;
 }
 
