@@ -97,7 +97,7 @@ public:
   //! \param[in] basis Which basis to connect, or 0 for all.
   //! \param[in] coordCheck False to disable coordinate checks (periodic connections)
   virtual bool connectPatch(int face, ASMs3D& neighbor, int nface, int norient,
-                            int basis = 0, bool coordCheck = true);
+                            int basis = 0, bool coordCheck = true, int thick = 1);
 
   //! \brief Makes two opposite boundary faces periodic.
   //! \param[in] dir Parameter direction defining the periodic faces
@@ -216,8 +216,10 @@ protected:
   //! \param[in] lIndex Local index of the boundary edge
   //! \param glbNodes Array of global boundary node numbers
   //! \param basis Which basis to grab nodes for (0 for all)
-  virtual void getBoundaryNodes(int lIndex, IntVec& glbNodes,
-                                int basis = 0, bool local = false) const;
+  //! \param thick Thickness of connection
+  //! \param local If true return patch-local node numbers
+  virtual void getBoundaryNodes(int lIndex, IntVec& glbNodes, int basis = 0,
+                                int thick = 1, bool local = false) const;
 
 private:
   std::vector<std::shared_ptr<Go::SplineVolume>> m_basis; //!< Vector of bases

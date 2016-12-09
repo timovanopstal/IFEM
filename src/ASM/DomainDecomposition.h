@@ -41,6 +41,7 @@ public:
     int orient; //!< Orientation.
     int dim;    //!< Dimension of boundary.
     int basis;  //!< Basis of boundary.
+    int thick;  //!< Thickness of connection.
   };
 
   //! \brief Functor to order ghost connections.

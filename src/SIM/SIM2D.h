@@ -75,14 +75,14 @@ public:
   //! \param slave Slave patch
   //! \param mIdx Index on master
   //! \param sIdx Index on slave
-  //! \param basis Bases to connect (0 for all)
   //! \param orient Orientation flag for connection (1 for reversed)
-  //! \param basis Which bases to connect (0 for all)
+  //! \param basis Bases to connect (0 for all)
   //! \param coordCheck False to turn off coordinate checks
   //! \param dim Dimensionality of connection
-  bool addConnection(int master, int slave, int mEdge, int sEdge,
+  //! \param thick Thickness of connection
+  bool addConnection(int master, int slave, int mIdx, int sIdx,
                      int orient, int basis = 0, bool coordCheck = true,
-                     int dim = 1);
+                     int dim = 1, int thick = 1);
 
   //! \brief Evaluates the primary solution at the given point.
   //! \param[in] psol Primary solution vector
