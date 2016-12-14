@@ -398,11 +398,6 @@ bool DomainDecomposition::calcGlobalNodeNumbers(const ProcessAdm& adm,
     setupNodeNumbers(it.basis, lNodes, cbasis, sim.getPatch(sidx),
                      it.dim, it.sidx, it.thick);
 
-    IFEM::cout << "Local nodes: ";
-    for (auto& it : lNodes)
-      IFEM::cout << it << " ";
-    IFEM::cout << std::endl;
-
     int nRecv;
     adm.receive(nRecv, getPatchOwner(it.master));
     if (nRecv =! lNodes.size()) {
@@ -413,10 +408,6 @@ bool DomainDecomposition::calcGlobalNodeNumbers(const ProcessAdm& adm,
     }
     IntVec glbNodes(lNodes.size());
     adm.receive(glbNodes, getPatchOwner(it.master));
-    IFEM::cout << "Recv nodes: ";
-    for (auto& it : glbNodes)
-      IFEM::cout << it << " ";
-    IFEM::cout << std::endl;
     size_t ofs = 0;
     for (size_t b = 1; b <= sim.getPatch(sidx)->getNoBasis(); ++b) {
       if (cbasis.empty() || cbasis.find(b) != cbasis.end()) {
