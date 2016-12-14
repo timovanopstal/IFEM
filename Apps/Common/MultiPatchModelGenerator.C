@@ -124,8 +124,8 @@ MultiPatchModelGenerator1D::createGeometry (const SIMbase& sim) const
       size_t di = ni + p;
 
       Go::SplineCurve subcur = getSubPatch(cur, i0, di, p+1);
-      std::cout << "  Number of knot spans in patch " << i << ": "
-                << subcur.numCoefs()-subcur.order()+1 << std::endl;
+      IFEM::cout << "  Number of knot spans in patch " << i << ": "
+                 << subcur.numCoefs()-subcur.order()+1 << std::endl;
       str << header << subcur;
     }
     sim.readPatches(str,result,"\t");
