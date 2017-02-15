@@ -21,6 +21,8 @@
 
 #include <vector>
 #include <iostream>
+#include <iomanip>
+#include <fstream>
 #include <algorithm>
 #include <cstring>
 #include <cmath>
@@ -753,6 +755,32 @@ namespace utl //! General utility classes and functions.
       n[2] = n_3;
     }
 
+    //! \brief Constructor fill matrix from istream.
+    matrix3d(const std::string& fname)
+    {
+      std::ifstream is(fname, std::ios::in);
+      for (size_t i=0; i<3; ++i)
+        is >> n[i];
+      double num;
+      elem.clear();
+      while (is >> num)
+        elem.push_back(num);
+      if (n[0]*n[1]*n[2] != elem.size())
+        std::cerr << "matrix3d: error reading from file, expected size "
+                  << n[0]*n[1]*n[2] << " but got " << elem.size() << std::endl;
+    }
+    //! \brief Dump contents to output stream.
+    void dump(const std::string& fname, size_t precision = 16)
+    {
+      std::ofstream os(fname);
+      os << std::setprecision(precision);
+      os << n[0] << std::endl << n[1] << std::endl << n[2] << std::endl;
+      for (size_t k=1; k<=n[2]; ++k)
+        for (size_t j=1; j<=n[1]; ++j)
+          for (size_t i=1; i<=n[0]; ++i)
+            os << this->operator()(i,j,k) << "\n";
+    }
+
     //! \brief Resize the matrix to dimension \f$n_1 \times n_2 \times n_3\f$.
     //! \details Will erase the previous content, but only if both
     //! the total matrix size, and n_1 or n_2 in the matrix are changed.
@@ -821,6 +849,13 @@ namespace utl //! General utility classes and functions.
       return elem[i1-1 + n[0]*((i2-1) + n[1]*(i3-1))];
     }
 
+    //! \brief Add the given matrix \b X to \a *this.
+    matrix3d<T>& operator+=(const matrix3d<T>& X) { return this->add(X); }
+    //! \brief Subtract the given matrix \b X from \a *this.
+    matrix3d<T>& operator-=(const matrix3d<T>& X) { return this->add(X,T(-1)); }
+    //! \brief Add the given matrix \b X scaled by \a alfa to \a *this.
+    matrix3d<T>& add(const matrix3d<T>& X, T alfa = T(1));
+
     //! \brief Access through pointer.
     T* ptr() { return &elem.front(); }
     //! \brief Reference through pointer.
@@ -841,6 +876,9 @@ namespace utl //! General utility classes and functions.
     */
     bool multiply(const matrix<T>& A, const matrix3d<T>& B,
                   bool transA = false, bool addTo = false);
+
+    //! \brief Return the Euclidean norm of the matrix.
+    T norm2() const { return elem.norm2(); }
 
   private:
     //! \brief Check dimension compatibility for matrix-matrix multiplication.
@@ -982,6 +1020,22 @@ namespace utl //! General utility classes and functions.
 
   template<> inline
   matrix<double>& matrix<double>::add(const matrix<double>& X, double alfa)
+  {
+    size_t n = this->size() < X.size() ? this->size() : X.size();
+    cblas_daxpy(n,alfa,X.ptr(),1,this->ptr(),1);
+    return *this;
+  }
+
+  template<> inline
+  matrix3d<float>& matrix3d<float>::add(const matrix3d<float>& X, float alfa)
+  {
+    size_t n = this->size() < X.size() ? this->size() : X.size();
+    cblas_saxpy(n,alfa,X.ptr(),1,this->ptr(),1);
+    return *this;
+  }
+
+  template<> inline
+  matrix3d<double>& matrix3d<double>::add(const matrix3d<double>& X, double alfa)
   {
     size_t n = this->size() < X.size() ? this->size() : X.size();
     cblas_daxpy(n,alfa,X.ptr(),1,this->ptr(),1);
@@ -1399,6 +1453,16 @@ namespace utl //! General utility classes and functions.
 
   template<class T> inline
   matrix<T>& matrix<T>::add(const matrix<T>& X, T alfa)
+  {
+    T* p = this->ptr();
+    const T* q = X.ptr();
+    for (size_t i = 0; i < this->size() && i < X.size(); i++, p++, q++)
+      *p += alfa*(*q);
+    return *this;
+  }
+
+  template<class T> inline
+  matrix3d<T>& matrix3d<T>::add(const matrix3d<T>& X, T alfa)
   {
     T* p = this->ptr();
     const T* q = X.ptr();
